@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block title %}My books | Smart Library{% endblock %}
+{% block content %}
+<h1 class="h2">My borrowed books</h1>
+<p class="text-secondary">Your current loans and previous borrowing records.</p>
+{% set history = books %}
+{% include "partials/history_table.html" %}
+{% endblock %}

@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}{{ "Edit" if account else "Create" }} account | Smart Library{% endblock %}
+{% block content %}
+<div class="form-card card shadow-sm"><div class="card-body p-4">
+  <h1 class="h2">{{ "Edit account" if account else "Create account" }}</h1>
+  <form method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    {% if not account %}
+    <div class="mb-3"><label class="form-label" for="username">Username</label>
+      <input class="form-control" id="username" name="username" required autocomplete="off"></div>
+    {% else %}<p><strong>Username:</strong> {{ account.username }}</p>{% endif %}
+    <div class="mb-3"><label class="form-label" for="full_name">Full name</label>
+      <input class="form-control" id="full_name" name="full_name" required
+             value="{{ account.full_name if account else '' }}"></div>
+    <div class="mb-3"><label class="form-label" for="role">Role</label>
+      <select class="form-select" id="role" name="role" required>
+        {% for role in roles %}<option value="{{ role }}"
+          {% if account and account.role == role %}selected{% endif %}>{{ role|capitalize }}</option>
+        {% endfor %}
+      </select></div>
+    <div class="mb-3"><label class="form-label" for="member_id">Linked library member</label>
+      <select class="form-select" id="member_id" name="member_id">
+        <option value="">Not linked</option>
+        {% for member in members %}<option value="{{ member.id }}"
+          {% if account and account.member_id == member.id %}selected{% endif %}>
+          {{ member.full_name }}</option>{% endfor %}
+      </select><div class="form-text">Required for student accounts.</div></div>
+    <div class="mb-3"><label class="form-label" for="password">
+      {{ "New password (leave blank to keep current)" if account else "Password" }}</label>
+      <input class="form-control" id="password" name="password" type="password"
+             {% if not account %}required{% endif %} minlength="8" autocomplete="new-password">
+      <div class="form-text">Use at least 8 characters.</div></div>
+    <button class="btn btn-primary">{{ "Save changes" if account else "Create account" }}</button>
+    <a class="btn btn-outline-secondary" href="{{ url_for('admin.users') }}">Cancel</a>
+  </form>
+</div></div>
+{% endblock %}

@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block title %}Books | Smart Library{% endblock %}
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+  <div>
+    <h1 class="h2 mb-1">{{ "Search books" if student_view else "Book management" }}</h1>
+    <p class="text-secondary mb-0">Search by title, author, ISBN, category, or book ID.</p>
+  </div>
+  {% if not student_view %}
+  <a class="btn btn-primary" href="{{ url_for('catalog.create_book') }}">Add book</a>
+  {% endif %}
+</div>
+<form class="row g-2 mb-3" method="get">
+  <div class="col-12 col-md-7">
+    <label class="visually-hidden" for="book-query">Search books</label>
+    <input class="form-control" id="book-query" name="q" value="{{ query }}"
+           placeholder="Title, author, ISBN, category, or ID">
+  </div>
+  <div class="col-8 col-md-3">
+    <label class="visually-hidden" for="category-filter">Category</label>
+    <select class="form-select" id="category-filter" name="category_id">
+      <option value="">All categories</option>
+      {% for category in categories %}
+      <option value="{{ category.id }}"
+        {% if selected_category|string == category.id|string %}selected{% endif %}>
+        {{ category.name }}
+      </option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="col-4 col-md-2 d-grid">
+    <button class="btn btn-outline-primary" type="submit">Search</button>
+  </div>
+</form>
+<div class="table-responsive bg-white rounded shadow-sm">
+  <table class="table table-hover align-middle mb-0">
+    <thead class="table-light">
+      <tr><th>ID</th><th>Title / Author</th><th>ISBN</th><th>Category</th>
+        <th>Availability</th>{% if not student_view %}<th>Actions</th>{% endif %}</tr>
+    </thead>
+    <tbody>
+      {% for book in books %}
+      <tr>
+        <td>{{ book.id }}</td>
+        <td><strong>{{ book.title }}</strong><br><span class="text-secondary">{{ book.author }}</span></td>
+        <td>{{ book.isbn }}</td>
+        <td>{{ book.category_name }}</td>
+        <td>
+          {% if book.available_copies > 0 %}
+          <span class="badge text-bg-success">Available</span>
+          {% else %}
+          <span class="badge text-bg-danger">Out of copies</span>
+          {% endif %}
+          <span class="text-nowrap">{{ book.available_copies }} / {{ book.total_copies }}</span>
+        </td>
+        {% if not student_view %}
+        <td class="text-nowrap">
+          <a class="btn btn-sm btn-outline-secondary"
+             href="{{ url_for('catalog.edit_book', book_id=book.id) }}">Edit</a>
+          <form class="d-inline" method="post"
+                action="{{ url_for('catalog.delete_book', book_id=book.id) }}"
+                onsubmit="return confirm('Delete this book? Books with history cannot be deleted.');">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button class="btn btn-sm btn-outline-danger" type="submit">Delete</button>
+          </form>
+        </td>
+        {% endif %}
+      </tr>
+      {% else %}
+      <tr><td colspan="6" class="text-center text-secondary py-4">No books matched your search.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

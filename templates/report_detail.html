@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}{{ title }} | Smart Library{% endblock %}
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-start gap-2 mb-3">
+  <div><h1 class="h2 mb-1">{{ title }}</h1><p class="text-secondary">{{ description }}</p></div>
+  <button class="btn btn-outline-primary no-print" type="button" onclick="window.print()">Print</button>
+</div>
+{% if title == "Borrowing history" %}
+<form class="row g-2 mb-3 no-print" method="get">
+  <div class="col-12 col-md-6"><label class="visually-hidden" for="member-filter">Filter by member</label>
+    <select class="form-select" id="member-filter" name="member_id">
+      <option value="">All members</option>
+      {% for member in members %}<option value="{{ member.id }}"
+        {% if selected_member|string == member.id|string %}selected{% endif %}>
+        {{ member.full_name }}</option>{% endfor %}
+    </select></div>
+  <div class="col-auto"><button class="btn btn-outline-primary">Filter</button></div>
+</form>
+{% endif %}
+<div class="table-responsive bg-white rounded shadow-sm">
+  <table class="table table-striped align-middle">
+    <thead><tr>{% for header in headers %}<th>{{ header }}</th>{% endfor %}</tr></thead>
+    <tbody>
+      {% for row in rows %}<tr>{% for value in row %}<td>{{ value if value is not none else "—" }}</td>{% endfor %}</tr>
+      {% else %}<tr><td colspan="{{ headers|length }}" class="text-center text-secondary py-4">No records for this report.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+<a class="btn btn-link no-print px-0" href="{{ url_for('reports.index') }}">Back to reports</a>
+{% endblock %}

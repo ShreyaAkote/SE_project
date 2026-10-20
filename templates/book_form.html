@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}{{ "Edit" if book else "Add" }} book | Smart Library{% endblock %}
+{% block content %}
+<div class="form-card card shadow-sm">
+  <div class="card-body p-4">
+    <h1 class="h2">{{ "Edit book" if book else "Add a book" }}</h1>
+    <form method="post">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <div class="mb-3">
+        <label class="form-label" for="title">Title</label>
+        <input class="form-control" id="title" name="title" required
+               value="{{ book.title if book else '' }}">
+      </div>
+      <div class="mb-3">
+        <label class="form-label" for="author">Author</label>
+        <input class="form-control" id="author" name="author" required
+               value="{{ book.author if book else '' }}">
+      </div>
+      <div class="mb-3">
+        <label class="form-label" for="isbn">ISBN</label>
+        <input class="form-control" id="isbn" name="isbn" required
+               value="{{ book.isbn if book else '' }}">
+      </div>
+      <div class="mb-3">
+        <label class="form-label" for="category_id">Category</label>
+        <select class="form-select" id="category_id" name="category_id" required>
+          <option value="">Choose category</option>
+          {% for category in categories %}
+          <option value="{{ category.id }}"
+            {% if book and book.category_id == category.id %}selected{% endif %}>
+            {{ category.name }}
+          </option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="mb-3">
+        <label class="form-label" for="total_copies">Total copies</label>
+        <input class="form-control" id="total_copies" name="total_copies"
+               type="number" min="0" required value="{{ book.total_copies if book else 1 }}">
+        {% if book %}
+        <div class="form-text">Currently available copies are adjusted to preserve active loans.</div>
+        {% endif %}
+      </div>
+      <button class="btn btn-primary" type="submit">Save book</button>
+      <a class="btn btn-outline-secondary" href="{{ url_for('catalog.books') }}">Cancel</a>
+    </form>
+  </div>
+</div>
+{% endblock %}

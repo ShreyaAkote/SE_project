@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}Member details | Smart Library{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-start mb-3">
+  <div><h1 class="h2">{{ member.full_name }}</h1>
+    <p class="text-secondary mb-0">Member #{{ member.id }} · {{ member.email }}
+      {% if member.phone %}· {{ member.phone }}{% endif %}</p></div>
+  <a class="btn btn-outline-secondary" href="{{ url_for('catalog.members') }}">Back to members</a>
+</div>
+<h2 class="h4 mt-4">Borrowing history</h2>
+{% include "partials/history_table.html" %}
+{% endblock %}

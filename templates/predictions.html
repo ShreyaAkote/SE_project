@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Predictions | Smart Library{% endblock %}
+{% block content %}
+<h1 class="h2">Predictions</h1>
+<p class="text-secondary">Models use saved borrowing history. Treat these results as planning estimates.</p>
+<section class="card shadow-sm mb-4">
+  <div class="card-body">
+    <h2 class="h4">Next month's category demand</h2>
+    <p>{{ results.demand.explanation }}</p>
+    {% if results.demand.mae is not none %}
+    <p class="small text-secondary">
+      Holdout accuracy: {{ results.demand.within_two_accuracy }}% of forecasts were
+      within two issues. Mean absolute error: {{ results.demand.mae }} issues.
+    </p>
+    <div class="table-responsive"><table class="table table-striped">
+      <thead><tr><th>Category</th><th>Estimated issues next month</th></tr></thead>
+      <tbody>{% for item in results.demand.forecasts %}
+        <tr><td>{{ item.category }}</td><td>{{ item.expected_issues }}</td></tr>
+      {% else %}<tr><td colspan="2">No categories to predict.</td></tr>{% endfor %}</tbody>
+    </table></div>
+    {% else %}<div class="alert alert-info">{{ results.demand.explanation }}</div>{% endif %}
+  </div>
+</section>
+<section class="card shadow-sm">
+  <div class="card-body">
+    <h2 class="h4">Late-return likelihood for current loans</h2>
+    <p>{{ results.lateness.explanation }}</p>
+    {% if results.lateness.accuracy is not none %}
+    <p class="small text-secondary">Chronological holdout accuracy:
+      {{ results.lateness.accuracy }}%.</p>
+    <div class="table-responsive"><table class="table table-striped">
+      <thead><tr><th>Issue ID</th><th>Book</th><th>Estimated risk</th><th>Signal</th></tr></thead>
+      <tbody>{% for item in results.lateness.predictions %}
+        <tr><td>{{ item.issue_id }}</td><td>{{ item.book }}</td>
+          <td>{{ item.risk }}%</td><td>{{ item.label }}</td></tr>
+      {% else %}<tr><td colspan="4">There are no current loans to score.</td></tr>{% endfor %}</tbody>
+    </table></div>
+    {% else %}<div class="alert alert-info">{{ results.lateness.explanation }}</div>{% endif %}
+  </div>
+</section>
+{% endblock %}

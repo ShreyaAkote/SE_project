@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Reports | Smart Library{% endblock %}
+{% block content %}
+<h1 class="h2">Library reports</h1>
+<p class="text-secondary">Choose a report. Each report can be printed or saved as PDF.</p>
+<div class="row g-3">
+  {% for report_type, details in reports.items() %}
+  <div class="col-12 col-md-6 col-lg-4">
+    <a class="card h-100 shadow-sm text-decoration-none"
+       href="{{ url_for('reports.show_report', report_type=report_type) }}">
+      <div class="card-body"><h2 class="h5 text-primary">{{ details[0] }}</h2>
+        <p class="text-secondary mb-0">{{ details[1] }}</p></div>
+    </a>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}

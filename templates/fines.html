@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Fines | Smart Library{% endblock %}
+{% block content %}
+<h1 class="h2">Fines</h1>
+<p class="text-secondary">Assessed late-return fines and payment status.</p>
+<div class="table-responsive bg-white rounded shadow-sm">
+  <table class="table table-hover align-middle mb-0">
+    <thead class="table-light"><tr><th>Member</th><th>Book</th><th>Issue #</th>
+      <th>Amount</th><th>Assessed</th><th>Status</th><th>Action</th></tr></thead>
+    <tbody>{% for fine in fines %}
+      <tr><td>{{ fine.full_name }}</td><td>{{ fine.title }}</td><td>{{ fine.issue_id }}</td>
+        <td>₹{{ "%.2f"|format(fine.amount) }}</td><td>{{ fine.assessed_on }}</td>
+        <td>{% if fine.paid_on %}<span class="badge text-bg-success">Paid {{ fine.paid_on }}</span>
+          {% else %}<span class="badge text-bg-warning">Unpaid</span>{% endif %}</td>
+        <td>{% if not fine.paid_on %}
+          <form method="post" action="{{ url_for('circulation.mark_fine_paid', fine_id=fine.id) }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button class="btn btn-sm btn-outline-primary">Mark paid</button>
+          </form>{% else %}—{% endif %}</td>
+      </tr>
+    {% else %}<tr><td colspan="7" class="text-center text-secondary py-4">No fines have been assessed.</td></tr>
+    {% endfor %}</tbody>
+  </table>
+</div>
+{% endblock %}

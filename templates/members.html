@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Members | Smart Library{% endblock %}
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+  <div><h1 class="h2 mb-1">Member management</h1>
+    <p class="text-secondary mb-0">Search members and open their borrowing history.</p></div>
+  <a class="btn btn-primary" href="{{ url_for('catalog.create_member') }}">Add member</a>
+</div>
+<form class="row g-2 mb-3" method="get">
+  <div class="col"><label class="visually-hidden" for="member-query">Search members</label>
+    <input class="form-control" id="member-query" name="q" value="{{ query }}"
+           placeholder="Name, email, phone, or member ID"></div>
+  <div class="col-auto"><button class="btn btn-outline-primary">Search</button></div>
+</form>
+<div class="table-responsive bg-white rounded shadow-sm">
+  <table class="table table-hover align-middle mb-0">
+    <thead class="table-light"><tr><th>ID</th><th>Name</th><th>Email</th>
+      <th>Phone</th><th>Borrowings</th><th>Actions</th></tr></thead>
+    <tbody>
+      {% for member in members %}
+      <tr>
+        <td>{{ member.id }}</td><td>{{ member.full_name }}</td><td>{{ member.email }}</td>
+        <td>{{ member.phone or "—" }}</td><td>{{ member.borrowing_count }}</td>
+        <td class="text-nowrap">
+          <a class="btn btn-sm btn-outline-primary"
+             href="{{ url_for('catalog.member_detail', member_id=member.id) }}">History</a>
+          <a class="btn btn-sm btn-outline-secondary"
+             href="{{ url_for('catalog.edit_member', member_id=member.id) }}">Edit</a>
+          <form class="d-inline" method="post"
+                action="{{ url_for('catalog.delete_member', member_id=member.id) }}"
+                onsubmit="return confirm('Delete this member? Members with borrowing history cannot be deleted.');">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button class="btn btn-sm btn-outline-danger">Delete</button>
+          </form>
+        </td>
+      </tr>
+      {% else %}<tr><td colspan="6" class="text-center text-secondary py-4">No members found.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}Analytics | Smart Library{% endblock %}
+{% block head %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
+{% block content %}
+<h1 class="h2">Library analytics</h1>
+<p class="text-secondary mb-4">Summaries calculated from recorded borrowing activity.</p>
+<div class="row g-3 mb-4">
+  <div class="col-12 col-sm-6"><section class="card shadow-sm"><div class="card-body">
+    <h2 class="h6 text-secondary">Currently overdue</h2>
+    <p class="display-6 mb-0 text-danger">{{ overdue_count }}</p>
+  </div></section></div>
+  <div class="col-12 col-sm-6"><section class="card shadow-sm"><div class="card-body">
+    <h2 class="h6 text-secondary">Fines collected</h2>
+    <p class="display-6 mb-0">₹{{ "%.2f"|format(fines_collected) }}</p>
+  </div></section></div>
+</div>
+<div class="row g-3">
+  {% for chart_id, title in [
+    ("mostBorrowedChart", "Most borrowed books"),
+    ("categoryChart", "Borrowing by category"),
+    ("monthlyChart", "Monthly issue trend (12 months)"),
+    ("activeMembersChart", "Most active members")
+  ] %}
+  <div class="col-12 col-lg-6"><section class="card shadow-sm h-100">
+    <div class="card-body"><h2 class="h5">{{ title }}</h2><div class="chart-container">
+      <canvas id="{{ chart_id }}" role="img" aria-label="{{ title }}"></canvas>
+    </div></div>
+  </section></div>
+  {% endfor %}
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+  const charts = {{ charts|tojson }};
+  const chartConfigs = [
+    ["mostBorrowedChart", charts.mostBorrowed, "bar", "Issues"],
+    ["categoryChart", charts.categories, "bar", "Issues"],
+    ["monthlyChart", charts.monthly, "line", "Issues"],
+    ["activeMembersChart", charts.activeMembers, "bar", "Loans"]
+  ];
+  for (const [canvasId, data, type, label] of chartConfigs) {
+    new Chart(document.getElementById(canvasId), {
+      type,
+      data: {
+        labels: data.labels,
+        datasets: [{ label, data: data.values, backgroundColor: "#0d6efd",
+          borderColor: "#0d6efd", tension: 0.25 }]
+      },
+      options: { responsive: true, maintainAspectRatio: false,
+        scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } }
+    });
+  }
+</script>
+{% endblock %}

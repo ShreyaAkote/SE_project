@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Issue a book | Smart Library{% endblock %}
+{% block content %}
+<div class="form-card card shadow-sm"><div class="card-body p-4">
+  <h1 class="h2">Issue a book</h1>
+  {% if not books or not members %}
+  <div class="alert alert-warning">Add a member and make sure a book has available copies before issuing.</div>
+  {% endif %}
+  <form method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div class="mb-3"><label class="form-label" for="member_id">Member</label>
+      <select class="form-select" id="member_id" name="member_id" required>
+        <option value="">Choose a member</option>
+        {% for member in members %}<option value="{{ member.id }}">{{ member.full_name }}</option>{% endfor %}
+      </select></div>
+    <div class="mb-3"><label class="form-label" for="book_id">Available book</label>
+      <select class="form-select" id="book_id" name="book_id" required>
+        <option value="">Choose a book</option>
+        {% for book in books %}
+        <option value="{{ book.id }}">{{ book.title }} ({{ book.available_copies }} available)</option>
+        {% endfor %}
+      </select></div>
+    <div class="mb-3"><label class="form-label" for="issue_date">Issue date</label>
+      <input class="form-control" id="issue_date" name="issue_date" type="date"
+             value="{{ today }}" max="{{ today }}" required></div>
+    <div class="mb-3"><label class="form-label" for="due_date">Due date</label>
+      <input class="form-control" id="due_date" name="due_date" type="date"
+             value="{{ default_due }}" required></div>
+    <button class="btn btn-primary" type="submit">Confirm issue</button>
+    <a class="btn btn-outline-secondary" href="{{ url_for('circulation.issues') }}">Cancel</a>
+  </form>
+</div></div>
+{% endblock %}

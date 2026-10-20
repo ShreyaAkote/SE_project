@@ -1,0 +1,20 @@
+<div class="table-responsive bg-white rounded shadow-sm">
+  {% if history is defined %}{% set records = history %}{% else %}{% set records = books %}{% endif %}
+  <table class="table table-hover align-middle mb-0">
+    <thead class="table-light"><tr><th>Book</th><th>Issued</th><th>Due</th>
+      <th>Returned</th><th>Status</th><th>Fine</th></tr></thead>
+    <tbody>
+      {% for record in records %}
+      <tr class="{% if record.is_overdue %}table-danger{% endif %}">
+        <td>{{ record.title }}</td><td>{{ record.issue_date }}</td><td>{{ record.due_date }}</td>
+        <td>{{ record.return_date or "Not returned" }}</td>
+        <td>{% if record.return_date %}Returned{% elif record.is_overdue %}
+          <span class="badge text-bg-danger">Overdue</span>{% else %}Borrowed{% endif %}</td>
+        <td>{% if record.fine_amount %}₹{{ "%.2f"|format(record.fine_amount) }}
+          {% if not record.paid_on %}(unpaid){% endif %}{% else %}—{% endif %}</td>
+      </tr>
+      {% else %}<tr><td colspan="6" class="text-center text-secondary py-4">No borrowing records.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>

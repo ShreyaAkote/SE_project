@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Dashboard | Smart Library{% endblock %}
+{% block content %}
+<h1 class="h2 mb-1">Librarian dashboard</h1>
+<p class="text-secondary mb-4">A quick overview of library activity.</p>
+<div class="row g-3 mb-4">
+  {% for label, value, link in [
+    ("Book titles", stats.books, url_for('catalog.books')),
+    ("Members", stats.members, url_for('catalog.members')),
+    ("Issue records", stats.issues, url_for('circulation.issues')),
+    ("Currently borrowed", stats.open_issues, url_for('circulation.issues')),
+    ("Overdue", stats.overdue, url_for('reports.show_report', report_type='overdue'))
+  ] %}
+  <div class="col-12 col-sm-6 col-lg">
+    <a class="card h-100 shadow-sm text-decoration-none" href="{{ link }}">
+      <div class="card-body">
+        <h2 class="h6 text-secondary">{{ label }}</h2>
+        <p class="display-6 text-dark mb-0">{{ value }}</p>
+      </div>
+    </a>
+  </div>
+  {% endfor %}
+</div>
+<div class="d-flex flex-wrap gap-2">
+  <a class="btn btn-primary" href="{{ url_for('circulation.new_issue') }}">Issue a book</a>
+  <a class="btn btn-outline-primary" href="{{ url_for('catalog.create_book') }}">Add a book</a>
+  <a class="btn btn-outline-primary" href="{{ url_for('catalog.create_member') }}">Add a member</a>
+  <a class="btn btn-outline-primary" href="{{ url_for('reports.index') }}">Open reports</a>
+</div>
+{% endblock %}

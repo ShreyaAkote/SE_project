@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Issue and return | Smart Library{% endblock %}
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+  <div><h1 class="h2 mb-1">Issue and return</h1>
+    <p class="text-secondary mb-0">Overdue loans are highlighted in red.</p></div>
+  <a class="btn btn-primary" href="{{ url_for('circulation.new_issue') }}">Issue a book</a>
+</div>
+<div class="table-responsive bg-white rounded shadow-sm">
+  <table class="table table-hover align-middle mb-0">
+    <thead class="table-light"><tr><th>ID</th><th>Book</th><th>Member</th><th>Issued</th>
+      <th>Due</th><th>Returned</th><th>Fine</th><th>Action</th></tr></thead>
+    <tbody>
+      {% for issue in issues %}
+      <tr class="{% if issue.is_overdue %}table-danger{% endif %}">
+        <td>{{ issue.id }}</td><td>{{ issue.title }}</td><td>{{ issue.member_name }}</td>
+        <td>{{ issue.issue_date }}</td><td>{{ issue.due_date }}
+          {% if issue.is_overdue %}<br><span class="badge text-bg-danger">OVERDUE</span>{% endif %}</td>
+        <td>{{ issue.return_date or "Not returned" }}</td>
+        <td>{% if issue.fine_amount %}₹{{ "%.2f"|format(issue.fine_amount) }}
+          {% if not issue.paid_on %}(unpaid){% endif %}{% else %}—{% endif %}</td>
+        <td>
+          {% if not issue.return_date %}
+          <form class="return-form" method="post"
+                action="{{ url_for('circulation.return_issue', issue_id=issue.id) }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input class="form-control form-control-sm mb-1" type="date" name="return_date"
+                   value="{{ today }}" max="{{ today }}" aria-label="Return date">
+            <button class="btn btn-sm btn-outline-primary" type="submit">Return</button>
+          </form>
+          {% else %}<span class="text-secondary">Complete</span>{% endif %}
+        </td>
+      </tr>
+      {% else %}<tr><td colspan="8" class="text-center text-secondary py-4">No issue records yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

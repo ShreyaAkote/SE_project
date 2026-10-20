@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Database backups | Smart Library{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <div><h1 class="h2 mb-1">Database backups</h1>
+    <p class="text-secondary mb-0">Download a saved SQLite database copy.</p></div>
+  <a class="btn btn-outline-secondary" href="{{ url_for('admin.users') }}">Back</a>
+</div>
+<div class="list-group">
+  {% for backup in backups %}
+  <a class="list-group-item list-group-item-action d-flex justify-content-between"
+     href="{{ url_for('admin.download_backup', filename=backup.name) }}">
+    <span>{{ backup.name }}</span><span>Download</span>
+  </a>
+  {% else %}<div class="list-group-item text-secondary">No backups have been created yet.</div>
+  {% endfor %}
+</div>
+{% endblock %}
